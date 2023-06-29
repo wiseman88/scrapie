@@ -8,15 +8,49 @@ const getPrice = (price) => {
   return svkPrice
 }
 
+const getUrl = (url) => {
+  const allegroUrl = url
+
+  return allegroUrl
+}
+
+const getSku = (url) => {
+  const sku = url.match(/\d+$/)[0]
+
+  return sku
+}
+
+const getRating = (min, max) => {
+  const randomNumber = Math.random() * (max - min) + min
+
+  const roundedNumber = Number(randomNumber.toFixed(2))
+
+  return roundedNumber
+}
+
+const getSold = () => {
+  const randomNumber = Math.floor(Math.random() * 200) + 1
+
+  return randomNumber
+}
+
+const getAddAttributes = (url) => {
+  const skladom = 0
+  const originalSku = getSku(url)
+  const originalUrl = getUrl(url)
+  const rating = getRating(4.5, 5.0)
+  const sold = getSold()
+  const incoming = 0
+
+  return `xxx_skladom=${skladom},xxx_original_sku=${originalSku},xxx_original_url=${originalUrl},xxx_rating=${rating},xxx_sold=${sold},xxx_incoming=${incoming}`
+}
+
 function extractDataFromHTML(html) {
   const $ = cheerio.load(html)
   const name = $('meta[property="og:title"]').attr('content')
   const desc = $('[data-box-name="Description"]>div>div>div>div>div>')
   const description = desc.clone().find('img').remove().end()
   const shortDescription = ''
-  const url = $('link[rel="canonical"]').attr('data-savepage-href')
-  const original_sku = url.match(/\d+$/)[0]
-  const sku = '21' + original_sku
   const attributeSetCode = 'Default'
   const productType = 'simple'
   const categories = ''
@@ -26,13 +60,21 @@ function extractDataFromHTML(html) {
   const visibility = 'Catalog, Search'
   // Get price in euros
   const price = getPrice($('meta[itemprop="price"]').attr('content'))
+  // Get url
+  const url = getUrl($('link[rel="canonical"]').attr('data-savepage-href'))
+  // Get Originial SKU
+  const original_sku = getSku(url)
+  // Get SKU
+  const sku = '21' + original_sku
+  // Get additional attributes
+  const additionalAttributes = getAddAttributes(
+    $('link[rel="canonical"]').attr('data-savepage-href')
+  )
 
   return {
     name,
     shortDescription,
     description,
-    url,
-    original_sku,
     sku,
     attributeSetCode,
     productType,
@@ -42,6 +84,7 @@ function extractDataFromHTML(html) {
     taxClassName,
     visibility,
     price,
+    additionalAttributes,
   }
 }
 
@@ -61,13 +104,11 @@ function readHTMLFiles() {
 
 function saveDataToCSV(data) {
   let csv =
-    'sku,attribute_set_code,product_type,categories,product_websites,name,short_description,description,product_online,tax_class_name,visibility,price,xxx_original_url,xxx_original_sku\n'
+    'sku,attribute_set_code,product_type,categories,product_websites,name,short_description,description,product_online,tax_class_name,visibility,price,additional_attributes\n'
 
   data.forEach((item) => {
     const name = `"${item.name}"`
-    const url = `"${item.url}"`
     const sku = `"${item.sku}"`
-    const original_sku = `"${item.original_sku}"`
     const cleanedHtmlString = `"${String(item.description).replace(
       /"/g,
       '""'
@@ -81,10 +122,11 @@ function saveDataToCSV(data) {
     const taxClassName = `"${item.taxClassName}"`
     const visibility = `"${item.visibility}"`
     const price = `"${item.price}"`
+    const additionalAttributes = `"${item.additionalAttributes}"`
 
     const description = cleanedHtmlString.replace(/<\/?div[^>]*>\s*/gi, '')
 
-    csv += `${sku},${attributeSetCode},${productType},${categories},${productWebsites},${name},${shortDescription},${description},${productOnline},${taxClassName},${visibility},${price},${url},${original_sku}\n`
+    csv += `${sku},${attributeSetCode},${productType},${categories},${productWebsites},${name},${shortDescription},${description},${productOnline},${taxClassName},${visibility},${price},${additionalAttributes}\n`
   })
 
   const timestamp = new Date().toISOString().replace(/:/g, '-')
