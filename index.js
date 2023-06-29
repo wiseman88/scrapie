@@ -104,7 +104,7 @@ function readHTMLFiles() {
 
 function saveDataToCSV(data) {
   let csv =
-    'sku,attribute_set_code,product_type,categories,product_websites,name,short_description,description,product_online,tax_class_name,visibility,price,additional_attributes\n'
+    'sku,attribute_set_code,product_type,categories,product_websites,name,short_description,description,product_online,tax_class_name,visibility,price,url_key,base_image,small_image,thumbnail_image,additional_attributes,qty,out_of_stock_qty,use_config_min_qty,is_qty_decimal,allow_backorders,use_config_backorders,min_cart_qty,use_config_min_sale_qty,max_cart_qty,use_config_max_sale_qty,is_in_stock,notify_on_stock_below,use_config_notify_stock_qty,manage_stock,use_config_manage_stock,use_config_qty_increments,qty_increments,use_config_enable_qty_inc,enable_qty_increments,is_decimal_divided,website_id\n'
 
   data.forEach((item) => {
     const name = `"${item.name}"`
@@ -122,11 +122,15 @@ function saveDataToCSV(data) {
     const taxClassName = `"${item.taxClassName}"`
     const visibility = `"${item.visibility}"`
     const price = `"${item.price}"`
+    const urlKey = ''
+    const baseImage = ''
+    const smallImage = ''
+    const thumbnailImage = ''
     const additionalAttributes = `"${item.additionalAttributes}"`
 
     const description = cleanedHtmlString.replace(/<\/?div[^>]*>\s*/gi, '')
 
-    csv += `${sku},${attributeSetCode},${productType},${categories},${productWebsites},${name},${shortDescription},${description},${productOnline},${taxClassName},${visibility},${price},${additionalAttributes}\n`
+    csv += `${sku},${attributeSetCode},${productType},${categories},${productWebsites},${name},${shortDescription},${description},${productOnline},${taxClassName},${visibility},${price},${urlKey},${baseImage},${smallImage},${thumbnailImage},${additionalAttributes},"99999","0","1","0","0","1","1","1","10000","1","1","1","1","0","1","1","1","1","0","0","0"\n`
   })
 
   const timestamp = new Date().toISOString().replace(/:/g, '-')
