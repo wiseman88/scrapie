@@ -50,6 +50,15 @@ function extractDataFromHTML(html) {
   const name = $('meta[property="og:title"]').attr('content')
   const desc = $('[data-box-name="Description"]>div>div>div>div>div>')
   const description = desc.clone().find('img').remove().end()
+
+  // Get images of product
+  const images = desc.find('img[data-savepage-src]')
+  const additionalImages = []
+  images.each((index, element) => {
+    const src = $(element).attr('data-savepage-src')
+    additionalImages.push(src)
+  })
+
   const shortDescription = ''
   const attributeSetCode = 'Default'
   const productType = 'simple'
@@ -85,6 +94,7 @@ function extractDataFromHTML(html) {
     visibility,
     price,
     additionalAttributes,
+    additionalImages,
   }
 }
 
@@ -104,7 +114,7 @@ function readHTMLFiles() {
 
 function saveDataToCSV(data) {
   let csv =
-    'sku,attribute_set_code,product_type,categories,product_websites,name,short_description,description,product_online,tax_class_name,visibility,price,url_key,base_image,small_image,thumbnail_image,additional_attributes,qty,out_of_stock_qty,use_config_min_qty,is_qty_decimal,allow_backorders,use_config_backorders,min_cart_qty,use_config_min_sale_qty,max_cart_qty,use_config_max_sale_qty,is_in_stock,notify_on_stock_below,use_config_notify_stock_qty,manage_stock,use_config_manage_stock,use_config_qty_increments,qty_increments,use_config_enable_qty_inc,enable_qty_increments,is_decimal_divided,website_id\n'
+    'sku,attribute_set_code,product_type,categories,product_websites,name,short_description,description,product_online,tax_class_name,visibility,price,url_key,base_image,small_image,thumbnail_image,additional_attributes,qty,out_of_stock_qty,use_config_min_qty,is_qty_decimal,allow_backorders,use_config_backorders,min_cart_qty,use_config_min_sale_qty,max_cart_qty,use_config_max_sale_qty,is_in_stock,notify_on_stock_below,use_config_notify_stock_qty,manage_stock,use_config_manage_stock,use_config_qty_increments,qty_increments,use_config_enable_qty_inc,enable_qty_increments,is_decimal_divided,website_id,additional_images\n'
 
   data.forEach((item) => {
     const name = `"${item.name}"`
@@ -127,10 +137,11 @@ function saveDataToCSV(data) {
     const smallImage = ''
     const thumbnailImage = ''
     const additionalAttributes = `"${item.additionalAttributes}"`
+    const additionalImages = `"${item.additionalImages}"`
 
     const description = cleanedHtmlString.replace(/<\/?div[^>]*>\s*/gi, '')
 
-    csv += `${sku},${attributeSetCode},${productType},${categories},${productWebsites},${name},${shortDescription},${description},${productOnline},${taxClassName},${visibility},${price},${urlKey},${baseImage},${smallImage},${thumbnailImage},${additionalAttributes},"99999","0","1","0","0","1","1","1","10000","1","1","1","1","0","1","1","1","1","0","0","0"\n`
+    csv += `${sku},${attributeSetCode},${productType},${categories},${productWebsites},${name},${shortDescription},${description},${productOnline},${taxClassName},${visibility},${price},${urlKey},${baseImage},${smallImage},${thumbnailImage},${additionalAttributes},"99999","0","1","0","0","1","1","1","10000","1","1","1","1","0","1","1","1","1","0","0","0",${additionalImages}\n`
   })
 
   const timestamp = new Date().toISOString().replace(/:/g, '-')
