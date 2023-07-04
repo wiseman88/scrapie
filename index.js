@@ -1,5 +1,7 @@
 import * as cheerio from 'cheerio'
 import fs from 'fs'
+import fetch from 'node-fetch'
+import path from 'path'
 
 const getPrice = (price) => {
   const rawPrice = price / 2
@@ -45,6 +47,22 @@ const getAddAttributes = (url) => {
   return `xxx_skladom=${skladom},xxx_original_sku=${originalSku},xxx_original_url=${originalUrl},xxx_rating=${rating},xxx_sold=${sold},xxx_incoming=${incoming}`
 }
 
+async function downloadImages(urls, folderPath) {
+  !fs.existsSync(folderPath)
+    ? fs.mkdirSync(folderPath, { recursive: true })
+    : fs.mkdirSync(folderPath + '_' + Date.now(), { recursive: true })
+
+  for (const url of urls) {
+    const response = await fetch(url)
+    const buffer = await response.arrayBuffer()
+
+    const filename = url.substring(url.lastIndexOf('/') + 1)
+    const filepath = path.join(folderPath, filename)
+
+    fs.writeFileSync(filepath, Buffer.from(buffer))
+  }
+}
+
 function extractDataFromHTML(html) {
   const $ = cheerio.load(html)
   const name = $('meta[property="og:title"]').attr('content')
@@ -58,6 +76,8 @@ function extractDataFromHTML(html) {
     const src = $(element).attr('data-savepage-src')
     additionalImages.push(src)
   })
+
+  downloadImages(additionalImages, './imgs/' + name)
 
   const shortDescription = ''
   const attributeSetCode = 'Default'
