@@ -5,9 +5,9 @@ import path from 'path'
 
 const getPrice = (price) => {
   const rawPrice = price / 2
-  const svkPrice = Number(rawPrice.toFixed(2))
+  const roundedPrice = Math.round(rawPrice * 20) / 20
 
-  return svkPrice
+  return roundedPrice.toFixed(2)
 }
 
 const getUrl = (url) => {
