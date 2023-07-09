@@ -71,13 +71,23 @@ function extractDataFromHTML(html) {
 
   // Get images of product
   const images = desc.find('img[data-savepage-src]')
+  const allImages = []
   const additionalImages = []
+  let baseImage = null
+
   images.each((index, element) => {
     const src = $(element).attr('data-savepage-src')
-    additionalImages.push(src)
+
+    allImages.push(src)
+
+    if (index === 0) {
+      baseImage = src
+    } else {
+      additionalImages.push(src)
+    }
   })
 
-  downloadImages(additionalImages, './imgs/' + name)
+  downloadImages(allImages, './imgs/' + name)
 
   const shortDescription = ''
   const attributeSetCode = 'Default'
@@ -114,6 +124,7 @@ function extractDataFromHTML(html) {
     visibility,
     price,
     additionalAttributes,
+    baseImage,
     additionalImages,
   }
 }
@@ -153,9 +164,9 @@ function saveDataToCSV(data) {
     const visibility = `"${item.visibility}"`
     const price = `"${item.price}"`
     const urlKey = ''
-    const baseImage = ''
-    const smallImage = ''
-    const thumbnailImage = ''
+    const baseImage = `"${item.baseImage}"`
+    const smallImage = `"${item.baseImage}"`
+    const thumbnailImage = `"${item.baseImage}"`
     const additionalAttributes = `"${item.additionalAttributes}"`
     const additionalImages = `"${item.additionalImages}"`
 
