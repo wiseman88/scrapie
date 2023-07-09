@@ -36,7 +36,7 @@ const getSold = () => {
   return randomNumber
 }
 
-const getAddAttributes = (url) => {
+const getAdditionalAttributes = (url) => {
   const skladom = 0
   const originalSku = getSku(url)
   const originalUrl = getUrl(url)
@@ -96,7 +96,7 @@ function extractDataFromHTML(html) {
   // Get SKU
   const sku = '21' + original_sku
   // Get additional attributes
-  const additionalAttributes = getAddAttributes(
+  const additionalAttributes = getAdditionalAttributes(
     $('link[rel="canonical"]').attr('data-savepage-href')
   )
 
