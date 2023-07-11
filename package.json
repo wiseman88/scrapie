@@ -13,6 +13,7 @@
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
     "fs": "^0.0.1-security",
+    "imagemin": "^8.0.1",
     "node-fetch": "^3.3.1"
   }
 }
