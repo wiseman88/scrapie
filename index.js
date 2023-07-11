@@ -1,5 +1,7 @@
 import * as cheerio from 'cheerio'
 import fs from 'fs'
+import imagemin from 'imagemin'
+import imageminMozjpeg from 'imagemin-mozjpeg'
 import fetch from 'node-fetch'
 import path from 'path'
 
@@ -54,12 +56,19 @@ async function downloadImages(urls, folderPath) {
 
   for (const url of urls) {
     const response = await fetch(url)
-    const buffer = await response.arrayBuffer()
+    const buffer = Buffer.from(await response.arrayBuffer())
 
     const filename = url.substring(url.lastIndexOf('/') + 1)
     const filepath = path.join(folderPath, filename)
 
-    fs.writeFileSync(filepath, Buffer.from(buffer))
+    // Optimize image size
+    const optimizedBuffer = await imagemin.buffer(buffer, {
+      plugins: [
+        imageminMozjpeg(), // Optimize JPEG images
+      ],
+    })
+
+    fs.writeFileSync(filepath, optimizedBuffer)
   }
 }
 
